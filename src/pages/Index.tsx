@@ -59,7 +59,7 @@ const Index = () => {
             Ngenda Logistics
           </h1>
           <p className="text-lg text-gray-600 mb-8">
-            Fresh groceries delivered to your doorstep
+            We Make Shopping Simple
           </p>
           <SearchBar onSearch={setSearchQuery} />
         </header>
