@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Github, Mail } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 
@@ -53,10 +54,10 @@ export function AuthForm() {
     }
   };
 
-  const handleGithubLogin = async () => {
+  const handleGoogleLogin = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
+        provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/profile`
         }
@@ -117,10 +118,10 @@ export function AuthForm() {
             type="button"
             variant="outline"
             className="w-full"
-            onClick={handleGithubLogin}
+            onClick={handleGoogleLogin}
           >
-            <Github className="mr-2" />
-            Continue with GitHub
+            <FcGoogle className="mr-2" />
+            Continue with Google
           </Button>
 
           <Button
