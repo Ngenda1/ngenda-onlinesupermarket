@@ -29,7 +29,7 @@ export function ProductCard({ title, price, image, category, onAddToCart }: Prod
       <CardContent className="p-4">
         <CardTitle className="text-lg font-medium line-clamp-2">{title}</CardTitle>
         <p className="text-2xl font-bold text-ngenda-900 mt-2">
-          ${price.toFixed(2)}
+          Ksh {price.toFixed(2)}
         </p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
