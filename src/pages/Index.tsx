@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { Mail, Phone } from "lucide-react";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,31 +75,47 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-ngenda-50 to-ngenda-100 animate-fade-in">
       <div className="container px-4 py-8">
-        <header className="flex justify-between items-center mb-12">
-          <div>
-            <h1 className="text-4xl font-bold text-ngenda-900 mb-4">
-              Ngenda Logistics
-            </h1>
-            <p className="text-lg text-gray-600">
-              We Make Shopping Simple
-            </p>
-          </div>
-          <div className="flex gap-4">
-            {isAuthenticated ? (
-              <Button 
-                onClick={handleLogoutClick}
-                className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-              >
-                Logout
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleLoginClick}
-                className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-              >
-                Login / Register
-              </Button>
-            )}
+        <header className="mb-12">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h1 className="text-4xl font-bold text-ngenda-900 mb-4">
+                Ngenda Logistics
+              </h1>
+              <p className="text-lg text-gray-600 mb-4">
+                We Make Shopping Simple
+              </p>
+              <div className="flex flex-col space-y-2 text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  <a href="tel:+254703503412" className="hover:text-ngenda-600 transition-colors">
+                    +254 703 503 412
+                  </a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  <a href="mailto:ngendalogistics@gmail.com" className="hover:text-ngenda-600 transition-colors">
+                    ngendalogistics@gmail.com
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              {isAuthenticated ? (
+                <Button 
+                  onClick={handleLogoutClick}
+                  className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
+                >
+                  Logout
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handleLoginClick}
+                  className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
+                >
+                  Login / Register
+                </Button>
+              )}
+            </div>
           </div>
         </header>
 
