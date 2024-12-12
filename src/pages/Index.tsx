@@ -73,10 +73,6 @@ const Index = () => {
     });
   };
 
-  const handleCheckoutClick = () => {
-    navigate('/checkout');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-ngenda-50 to-ngenda-100 animate-fade-in">
       <div className="container px-4 py-8">
@@ -91,20 +87,12 @@ const Index = () => {
           </div>
           <div className="flex gap-4">
             {isAuthenticated ? (
-              <>
-                <Button 
-                  onClick={handleCheckoutClick}
-                  variant="outline"
-                >
-                  Checkout
-                </Button>
-                <Button 
-                  onClick={handleLogoutClick}
-                  className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-                >
-                  Logout
-                </Button>
-              </>
+              <Button 
+                onClick={handleLogoutClick}
+                className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
+              >
+                Logout
+              </Button>
             ) : (
               <Button 
                 onClick={handleLoginClick}
