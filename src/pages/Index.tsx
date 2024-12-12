@@ -5,6 +5,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { CheckoutForm } from "@/components/CheckoutForm";
+import { PaymentMethods } from "@/components/PaymentMethods";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,12 +80,31 @@ const PRODUCTS = [
               We Make Shopping Simple
             </p>
           </div>
-          <Button 
-            onClick={handleLoginClick}
-            className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-          >
-            Login / Register
-          </Button>
+          <div className="flex gap-4">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline">Payment Methods</Button>
+              </SheetTrigger>
+              <SheetContent className="w-[400px] sm:w-[540px]">
+                <SheetHeader>
+                  <SheetTitle>Payment Methods</SheetTitle>
+                  <SheetDescription>
+                    Manage your payment methods and add new ones.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="mt-6 space-y-8">
+                  <PaymentMethods />
+                  <CheckoutForm />
+                </div>
+              </SheetContent>
+            </Sheet>
+            <Button 
+              onClick={handleLoginClick}
+              className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
+            >
+              Login / Register
+            </Button>
+          </div>
         </header>
 
         <div className="mb-8">
