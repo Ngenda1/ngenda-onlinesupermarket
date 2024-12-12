@@ -55,6 +55,34 @@ const Index = () => {
       image: "https://images.unsplash.com/photo-1550583724-b2692b85b150",
       category: "Dairy",
     },
+    {
+      id: 5,
+      title: "Fresh Mixed Fruits",
+      price: 12.99,
+      image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
+      category: "Fruits",
+    },
+    {
+      id: 6,
+      title: "Premium Coffee Beans",
+      price: 15.99,
+      image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e",
+      category: "Beverages",
+    },
+    {
+      id: 7,
+      title: "Organic Honey",
+      price: 8.99,
+      image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38",
+      category: "Condiments",
+    },
+    {
+      id: 8,
+      title: "Fresh Vegetables Pack",
+      price: 19.99,
+      image: "https://images.unsplash.com/photo-1540420773420-3366772f4999",
+      category: "Vegetables",
+    }
   ];
 
   const filteredProducts = PRODUCTS.filter((product) =>
