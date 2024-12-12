@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { Mail, Phone } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,12 +16,10 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
     });
@@ -28,21 +27,37 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const { data: products = [], isLoading, error } = useQuery({
-    queryKey: ['products'],
+  // Query for featured products (products without category)
+  const { data: featuredProducts = [], isLoading: isFeaturedLoading } = useQuery({
+    queryKey: ['featuredProducts'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('products')
-        .select('*');
+        .select('*')
+        .is('category_id', null);
       
       if (error) throw error;
       return data;
     }
   });
 
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Query for categories and their products
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select(`
+          id,
+          name,
+          description,
+          products (*)
+        `);
+      
+      if (error) throw error;
+      return data;
+    }
+  });
 
   const handleLoginClick = () => {
     navigate('/auth');
@@ -56,18 +71,14 @@ const Index = () => {
     });
   };
 
-  if (isLoading) {
+  const filteredFeaturedProducts = featuredProducts.filter((product) =>
+    product.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (isFeaturedLoading || isCategoriesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-ngenda-50 to-ngenda-100 flex items-center justify-center">
         <div className="text-2xl text-ngenda-600">Loading products...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-ngenda-50 to-ngenda-100 flex items-center justify-center">
-        <div className="text-2xl text-red-600">Error loading products. Please try again later.</div>
       </div>
     );
   }
@@ -123,19 +134,61 @@ const Index = () => {
           <SearchBar onSearch={setSearchQuery} />
         </div>
 
-        <main>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                price={product.price}
-                image={product.image}
-                category={product.category}
-              />
-            ))}
-          </div>
+        <main className="space-y-16">
+          {/* Featured Products Section */}
+          <section>
+            <h2 className="text-3xl font-bold text-ngenda-900 mb-8">Featured Products</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredFeaturedProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  title={product.title}
+                  price={product.price}
+                  image={product.image}
+                  category={product.category}
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* Categories Section */}
+          <section>
+            <h2 className="text-3xl font-bold text-ngenda-900 mb-8">Shop by Category</h2>
+            <Tabs defaultValue={categories[0]?.id.toString()} className="w-full">
+              <TabsList className="w-full flex flex-wrap justify-start mb-6">
+                {categories.map((category) => (
+                  <TabsTrigger
+                    key={category.id}
+                    value={category.id.toString()}
+                    className="px-6"
+                  >
+                    {category.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {categories.map((category) => (
+                <TabsContent key={category.id} value={category.id.toString()}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {category.products
+                      .filter((product) =>
+                        product.title.toLowerCase().includes(searchQuery.toLowerCase())
+                      )
+                      .map((product) => (
+                        <ProductCard
+                          key={product.id}
+                          id={product.id}
+                          title={product.title}
+                          price={product.price}
+                          image={product.image}
+                          category={category.name}
+                        />
+                      ))}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </section>
         </main>
       </div>
     </div>
