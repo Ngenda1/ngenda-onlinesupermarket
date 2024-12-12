@@ -22,25 +22,32 @@ export function AuthForm() {
 
     try {
       if (isLogin) {
-        const { error, data } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
+        
         toast({
           title: "Success",
           description: "Logged in successfully",
         });
         navigate("/profile");
       } else {
+        // Registration logic
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth`,
+          },
         });
+        
         if (error) throw error;
+
         toast({
           title: "Success",
-          description: "Registration successful! Please check your email.",
+          description: "Registration successful! Please check your email for verification.",
         });
       }
     } catch (error: any) {
