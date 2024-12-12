@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,66 +27,19 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const PRODUCTS = [
-    {
-      id: 1,
-      title: "Fresh Organic Bananas",
-      price: 4.99,
-      image: "https://images.unsplash.com/photo-1481349518771-20055b2a7b24",
-      category: "Fruits",
-    },
-    {
-      id: 2,
-      title: "Whole Grain Bread",
-      price: 3.49,
-      image: "https://images.unsplash.com/photo-1509440159596-0249088772ff",
-      category: "Bakery",
-    },
-    {
-      id: 3,
-      title: "Farm Fresh Eggs",
-      price: 5.99,
-      image: "https://images.unsplash.com/photo-1518492104633-130d0cc84637",
-      category: "Dairy",
-    },
-    {
-      id: 4,
-      title: "Organic Milk",
-      price: 4.49,
-      image: "https://images.unsplash.com/photo-1550583724-b2692b85b150",
-      category: "Dairy",
-    },
-    {
-      id: 5,
-      title: "Fresh Mixed Fruits",
-      price: 12.99,
-      image: "https://images.unsplash.com/photo-1618160702438-9b02ab6515c9",
-      category: "Fruits",
-    },
-    {
-      id: 6,
-      title: "Premium Coffee Beans",
-      price: 15.99,
-      image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e",
-      category: "Beverages",
-    },
-    {
-      id: 7,
-      title: "Organic Honey",
-      price: 8.99,
-      image: "https://images.unsplash.com/photo-1587049352846-4a222e784d38",
-      category: "Condiments",
-    },
-    {
-      id: 8,
-      title: "Fresh Vegetables Pack",
-      price: 19.99,
-      image: "https://images.unsplash.com/photo-1540420773420-3366772f4999",
-      category: "Vegetables",
+  const { data: products = [], isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*');
+      
+      if (error) throw error;
+      return data;
     }
-  ];
+  });
 
-  const filteredProducts = PRODUCTS.filter((product) =>
+  const filteredProducts = products.filter((product) =>
     product.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -100,6 +54,22 @@ const Index = () => {
       description: "You have been successfully logged out",
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-ngenda-50 to-ngenda-100 flex items-center justify-center">
+        <div className="text-2xl text-ngenda-600">Loading products...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-ngenda-50 to-ngenda-100 flex items-center justify-center">
+        <div className="text-2xl text-red-600">Error loading products. Please try again later.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-ngenda-50 to-ngenda-100 animate-fade-in">
