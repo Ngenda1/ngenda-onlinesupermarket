@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,24 @@ export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/");
+      }
+    });
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +50,7 @@ export function AuthForm() {
           title: "Success",
           description: "Logged in successfully",
         });
-        navigate("/profile");
+        navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -48,6 +66,7 @@ export function AuthForm() {
           title: "Success",
           description: "Registration successful! Please check your email for verification.",
         });
+        navigate("/");
       }
     } catch (error: any) {
       console.error("Auth error:", error);
