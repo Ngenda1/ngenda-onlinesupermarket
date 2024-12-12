@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { SearchBar } from "@/components/SearchBar";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const PRODUCTS = [
@@ -45,14 +42,6 @@ const Index = () => {
   const filteredProducts = PRODUCTS.filter((product) =>
     product.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const handleAddToCart = (productId: number) => {
-    toast({
-      title: "Added to cart",
-      description: "Product has been added to your cart",
-      duration: 2000,
-    });
-  };
 
   const handleLoginClick = () => {
     navigate('/auth');
@@ -99,11 +88,11 @@ const Index = () => {
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
+                id={product.id}
                 title={product.title}
                 price={product.price}
                 image={product.image}
                 category={product.category}
-                onAddToCart={() => handleAddToCart(product.id)}
               />
             ))}
           </div>

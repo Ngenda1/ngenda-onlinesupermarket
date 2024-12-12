@@ -11,6 +11,9 @@ interface CartItem {
   quantity: number;
   price: number;
   title: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
 }
 
 const Cart = () => {
@@ -31,7 +34,8 @@ const Cart = () => {
 
       if (error) throw error;
 
-      setCartItems(items || []);
+      // Type assertion since we know the data includes the title
+      setCartItems(items as CartItem[]);
     } catch (error) {
       console.error("Error fetching cart items:", error);
       toast({
