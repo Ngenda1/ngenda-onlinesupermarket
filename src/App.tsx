@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import { AuthForm } from "./components/auth/AuthForm";
 import { Profile } from "./components/auth/Profile";
 import Checkout from "./pages/Checkout";
+import Cart from "./pages/Cart";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/cart" element={<Cart />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
