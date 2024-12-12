@@ -1,12 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const PRODUCTS = [
     {
@@ -47,6 +65,14 @@ const Index = () => {
     navigate('/auth');
   };
 
+  const handleLogoutClick = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out",
+    });
+  };
+
   const handleCheckoutClick = () => {
     navigate('/checkout');
   };
@@ -64,18 +90,29 @@ const Index = () => {
             </p>
           </div>
           <div className="flex gap-4">
-            <Button 
-              onClick={handleCheckoutClick}
-              variant="outline"
-            >
-              Checkout
-            </Button>
-            <Button 
-              onClick={handleLoginClick}
-              className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-            >
-              Login / Register
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button 
+                  onClick={handleCheckoutClick}
+                  variant="outline"
+                >
+                  Checkout
+                </Button>
+                <Button 
+                  onClick={handleLogoutClick}
+                  className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={handleLoginClick}
+                className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
+              >
+                Login / Register
+              </Button>
+            )}
           </div>
         </header>
 
