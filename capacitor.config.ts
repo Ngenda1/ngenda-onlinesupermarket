@@ -9,10 +9,10 @@ const config: CapacitorConfig = {
   },
   android: {
     buildOptions: {
-      keystorePath: null,
-      keystoreAlias: null,
-      keystorePassword: null,
-      keystoreKeyPassword: null,
+      keystorePath: 'release-key.keystore',
+      keystoreAlias: 'ngenda-key-alias',
+      keystorePassword: 'your-keystore-password',
+      keystoreKeyPassword: 'your-key-password',
     }
   }
 };
