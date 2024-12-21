@@ -44,7 +44,18 @@ export function AuthForm() {
           password,
         });
         
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('Email not confirmed')) {
+            toast({
+              title: "Email Not Verified",
+              description: "Please check your email and verify your account before logging in. If you haven't received the email, you can sign up again to receive a new verification email.",
+              variant: "destructive",
+            });
+          } else {
+            throw error;
+          }
+          return;
+        }
         
         toast({
           title: "Success",
@@ -66,7 +77,6 @@ export function AuthForm() {
           title: "Success",
           description: "Registration successful! Please check your email for verification.",
         });
-        navigate("/");
       }
     } catch (error: any) {
       console.error("Auth error:", error);
