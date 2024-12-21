@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { SearchBar } from "@/components/SearchBar";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { Mail, Phone, UserRound } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { NavigationMenu } from "@/components/navigation/NavigationMenu";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,7 +27,6 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Query for featured products (products without category)
   const { data: featuredProducts = [], isLoading: isFeaturedLoading } = useQuery({
     queryKey: ['featuredProducts'],
     queryFn: async () => {
@@ -110,33 +109,7 @@ const Index = () => {
                 </div>
               </div>
             </div>
-            <div className="flex gap-4">
-              {isAuthenticated ? (
-                <>
-                  <Button 
-                    onClick={handleProfileClick}
-                    variant="outline"
-                    className="flex items-center gap-2"
-                  >
-                    <UserRound className="h-4 w-4" />
-                    Profile
-                  </Button>
-                  <Button 
-                    onClick={handleLogoutClick}
-                    className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-                  >
-                    Logout
-                  </Button>
-                </>
-              ) : (
-                <Button 
-                  onClick={handleLoginClick}
-                  className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-                >
-                  Login / Register
-                </Button>
-              )}
-            </div>
+            <NavigationMenu isAuthenticated={isAuthenticated} />
           </div>
         </header>
 
