@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, CreditCard, ShoppingBag } from "lucide-react";
+import { Loader2, CreditCard, ShoppingBag, UserCog } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 
@@ -14,6 +15,7 @@ export function Profile() {
     name: "",
     address: "",
     phone: "",
+    role: "customer",
   });
   const [orders, setOrders] = useState<any[]>([]);
   const { toast } = useToast();
@@ -32,7 +34,10 @@ export function Profile() {
           .single();
         
         if (profileData) {
-          setProfile(profileData);
+          setProfile(prev => ({
+            ...prev,
+            role: profileData.role
+          }));
         }
 
         // Get orders data
@@ -59,7 +64,7 @@ export function Profile() {
         .from("profiles")
         .upsert({
           id: user?.id,
-          ...profile,
+          role: profile.role,
           updated_at: new Date(),
         });
 
@@ -80,8 +85,14 @@ export function Profile() {
     }
   };
 
+  const handleRoleChange = (value: string) => {
+    setProfile(prev => ({
+      ...prev,
+      role: value
+    }));
+  };
+
   const handleAddPaymentMethod = () => {
-    // This would typically integrate with a payment provider like Stripe
     toast({
       title: "Coming Soon",
       description: "Payment method management will be available soon!",
@@ -112,33 +123,32 @@ export function Profile() {
     <div className="container mx-auto px-4 py-8 space-y-6">
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <UserCog className="h-5 w-5" />
+            Profile
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="space-y-2">
-              <label>Name</label>
+              <label>Email</label>
               <Input
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                placeholder="Your name"
+                value={user.email}
+                disabled
+                className="bg-gray-100"
               />
             </div>
             <div className="space-y-2">
-              <label>Address</label>
-              <Input
-                value={profile.address}
-                onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                placeholder="Your address"
-              />
-            </div>
-            <div className="space-y-2">
-              <label>Phone</label>
-              <Input
-                value={profile.phone}
-                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                placeholder="Your phone number"
-              />
+              <label>Role</label>
+              <Select value={profile.role} onValueChange={handleRoleChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="customer">Customer</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex gap-4">
               <Button type="submit" disabled={loading}>
