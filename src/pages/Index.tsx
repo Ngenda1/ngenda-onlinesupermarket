@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, UserRound } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
@@ -71,9 +71,9 @@ const Index = () => {
     });
   };
 
-  const filteredFeaturedProducts = featuredProducts.filter((product) =>
-    product.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
   if (isFeaturedLoading || isCategoriesLoading) {
     return (
@@ -112,12 +112,22 @@ const Index = () => {
             </div>
             <div className="flex gap-4">
               {isAuthenticated ? (
-                <Button 
-                  onClick={handleLogoutClick}
-                  className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
-                >
-                  Logout
-                </Button>
+                <>
+                  <Button 
+                    onClick={handleProfileClick}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <UserRound className="h-4 w-4" />
+                    Profile
+                  </Button>
+                  <Button 
+                    onClick={handleLogoutClick}
+                    className="bg-ngenda-600 hover:bg-ngenda-700 text-white"
+                  >
+                    Logout
+                  </Button>
+                </>
               ) : (
                 <Button 
                   onClick={handleLoginClick}
@@ -139,7 +149,9 @@ const Index = () => {
           <section>
             <h2 className="text-3xl font-bold text-ngenda-900 mb-8">Featured Products</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredFeaturedProducts.map((product) => (
+              {featuredProducts.filter((product) =>
+                product.title.toLowerCase().includes(searchQuery.toLowerCase())
+              ).map((product) => (
                 <ProductCard
                   key={product.id}
                   id={product.id}
