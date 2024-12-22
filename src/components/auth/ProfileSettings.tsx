@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, UserCog } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProfileSettingsProps {
   user: any;
@@ -27,11 +27,11 @@ export function ProfileSettings({ user, profile, onSignOut }: ProfileSettingsPro
     try {
       const { error } = await supabase
         .from("profiles")
-        .upsert({
-          id: user?.id,
+        .update({
           role: currentRole,
-          updated_at: new Date(),
-        });
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id);
 
       if (error) throw error;
 
@@ -40,9 +40,10 @@ export function ProfileSettings({ user, profile, onSignOut }: ProfileSettingsPro
         description: `Profile updated successfully. Your role is now: ${currentRole}`,
       });
     } catch (error: any) {
+      console.error("Error updating profile:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to update profile",
         variant: "destructive",
       });
     } finally {
