@@ -20,52 +20,58 @@ export function Profile() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError) throw userError;
+        
+        if (!user) {
+          navigate("/auth");
+          return;
+        }
+
         setUser(user);
         
-        if (user) {
-          // Get profile data using maybeSingle() instead of single()
-          const { data: profileData, error: profileError } = await supabase
-            .from("profiles")
-            .select()
-            .eq("id", user.id)
-            .maybeSingle();
-          
-          if (profileError) {
-            toast({
-              title: "Error",
-              description: "Failed to load profile data",
-              variant: "destructive",
-            });
-            return;
-          }
-          
-          if (profileData) {
-            setProfile(prev => ({
-              ...prev,
-              role: profileData.role
-            }));
-          }
+        // Get profile data using maybeSingle() instead of single()
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select()
+          .eq("id", user.id)
+          .maybeSingle();
+        
+        if (profileError) {
+          toast({
+            title: "Error",
+            description: "Failed to load profile data",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (profileData) {
+          setProfile(prev => ({
+            ...prev,
+            role: profileData.role
+          }));
+        }
 
-          // Get orders data
-          const { data: ordersData, error: ordersError } = await supabase
-            .from("orders")
-            .select()
-            .eq("user_id", user.id)
-            .order('created_at', { ascending: false });
+        // Get orders data
+        const { data: ordersData, error: ordersError } = await supabase
+          .from("orders")
+          .select()
+          .eq("user_id", user.id)
+          .order('created_at', { ascending: false });
 
-          if (ordersError) {
-            toast({
-              title: "Error",
-              description: "Failed to load orders data",
-              variant: "destructive",
-            });
-            return;
-          }
+        if (ordersError) {
+          toast({
+            title: "Error",
+            description: "Failed to load orders data",
+            variant: "destructive",
+          });
+          return;
+        }
 
-          if (ordersData) {
-            setOrders(ordersData);
-          }
+        if (ordersData) {
+          setOrders(ordersData);
         }
       } catch (error: any) {
         toast({
@@ -73,10 +79,11 @@ export function Profile() {
           description: error.message,
           variant: "destructive",
         });
+        navigate("/auth");
       }
     };
     getUser();
-  }, [toast]);
+  }, [navigate, toast]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
