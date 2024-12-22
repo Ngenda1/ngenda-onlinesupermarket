@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, UserCog } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface ProfileSettingsProps {
   user: any;
@@ -19,6 +20,7 @@ export function ProfileSettings({ user, profile, onSignOut }: ProfileSettingsPro
   const [loading, setLoading] = useState(false);
   const [currentRole, setCurrentRole] = useState(profile.role);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +41,9 @@ export function ProfileSettings({ user, profile, onSignOut }: ProfileSettingsPro
         title: "Success",
         description: `Profile updated successfully. Your role is now: ${currentRole}`,
       });
+      
+      // Navigate back to home page after successful update
+      navigate("/");
     } catch (error: any) {
       console.error("Error updating profile:", error);
       toast({
@@ -49,6 +54,10 @@ export function ProfileSettings({ user, profile, onSignOut }: ProfileSettingsPro
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBackToMenu = () => {
+    navigate("/");
   };
 
   return (
@@ -88,6 +97,9 @@ export function ProfileSettings({ user, profile, onSignOut }: ProfileSettingsPro
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Update Profile
+            </Button>
+            <Button type="button" variant="outline" onClick={handleBackToMenu}>
+              Back to Menu
             </Button>
             <Button type="button" variant="destructive" onClick={onSignOut}>
               Sign Out
