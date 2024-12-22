@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { ProfileSettings } from "./ProfileSettings";
 import { PaymentMethodsSection } from "./PaymentMethodsSection";
 import { OrderHistory } from "./OrderHistory";
+import { useToast } from "@/components/ui/use-toast";
 
 export function Profile() {
   const [user, setUser] = useState<any>(null);
@@ -14,40 +15,68 @@ export function Profile() {
   });
   const [orders, setOrders] = useState<any[]>([]);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
-        // Get profile data
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select()
-          .eq("id", user.id)
-          .single();
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
         
-        if (profileData) {
-          setProfile(prev => ({
-            ...prev,
-            role: profileData.role
-          }));
-        }
+        if (user) {
+          // Get profile data using maybeSingle() instead of single()
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select()
+            .eq("id", user.id)
+            .maybeSingle();
+          
+          if (profileError) {
+            toast({
+              title: "Error",
+              description: "Failed to load profile data",
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          if (profileData) {
+            setProfile(prev => ({
+              ...prev,
+              role: profileData.role
+            }));
+          }
 
-        // Get orders data
-        const { data: ordersData } = await supabase
-          .from("orders")
-          .select()
-          .eq("user_id", user.id)
-          .order('created_at', { ascending: false });
+          // Get orders data
+          const { data: ordersData, error: ordersError } = await supabase
+            .from("orders")
+            .select()
+            .eq("user_id", user.id)
+            .order('created_at', { ascending: false });
 
-        if (ordersData) {
-          setOrders(ordersData);
+          if (ordersError) {
+            toast({
+              title: "Error",
+              description: "Failed to load orders data",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          if (ordersData) {
+            setOrders(ordersData);
+          }
         }
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
       }
     };
     getUser();
-  }, []);
+  }, [toast]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
